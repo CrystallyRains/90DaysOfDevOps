@@ -1,86 +1,137 @@
-# Day 02 – Linux Architecture, Processes & systemd
+# Day 02 - Linux Architecture, Processes & systemd
 
 ## Objective
 
-Today's goal was to understand how Linux works under the hood and why it is the foundation of modern DevOps environments.
+Today's goal was to understand how Linux works behind the scenes.
 
-Along with learning Linux fundamentals, I also applied these concepts by launching an AWS EC2 instance, installing Nginx, and deploying a simple HTML webpage.
+Instead of just learning Linux concepts, we also applied them by launching an AWS EC2 instance, installing Nginx, and deploying a simple HTML webpage.
 
 ---
 
-## Topics Covered
+# What I Learned Today
 
 - Linux Architecture
 - Virtualization & Hypervisors
 - Linux Boot Process
 - Linux Processes
 - systemd
-- Package Management
 - Essential Linux Commands
+- Package Management
 - AWS EC2
 - Nginx
 - Claude Code
 
 ---
 
-## Concepts Learned
+# Concepts Learned
 
-### Linux Architecture
+## Linux Architecture
 
-Linux consists of four major layers.
+Think of Linux as four layers working together.
 
 ```text
-Applications
-     │
-     ▼
-   Shell
-     │
-     ▼
-   Kernel
-     │
-     ▼
-  Hardware
++----------------------+
+|     Applications     |
++----------------------+
+           │
+           ▼
++----------------------+
+|        Shell         |
++----------------------+
+           │
+           ▼
++----------------------+
+|       Kernel         |
++----------------------+
+           │
+           ▼
++----------------------+
+|      Hardware        |
++----------------------+
 ```
 
 ### Hardware
 
-The physical components of a computer, such as:
+The physical parts of a computer.
+
+Examples:
 
 - CPU
 - RAM
 - Storage
-- Network Interface
+- Network Card
+
+Without hardware, Linux has nothing to run on.
+
+---
 
 ### Kernel
 
-The kernel is the core of the Linux operating system.
+The kernel is the brain of Linux.
 
-Responsibilities include:
+Whenever you:
+
+- Open a file
+- Run a command
+- Use memory
+- Connect hardware
+
+the kernel is doing the actual work.
+
+Main responsibilities:
 
 - Process Management
 - Memory Management
-- Hardware Communication
 - File System Management
-- CPU Scheduling
+- Hardware Communication
+
+**Easy way to remember**
+
+Kernel = Brain of Linux
+
+---
 
 ### Shell
 
-The shell acts as an interface between the user and the kernel.
+Whenever we type a command like:
 
-Examples:
+```bash
+ls
+```
+
+the shell understands it and passes it to the kernel.
+
+Common shells:
 
 - Bash
 - Zsh
 
-Whenever a command is executed, the shell communicates with the kernel to perform the requested operation.
+**Easy way to remember**
+
+You → Shell → Kernel
+
+---
+
+### Applications
+
+These are the programs we use every day.
+
+Examples:
+
+- VS Code
+- Chrome
+- Docker
+- Terminal
+
+Applications interact with the shell and kernel to get work done.
 
 ---
 
 ## Virtualization
 
-Virtualization allows multiple operating systems to run on a single physical machine.
+Virtualization lets us run multiple operating systems on the same physical machine.
 
-This is achieved using a Hypervisor.
+This is possible because of a **Hypervisor**.
 
 ### Type 1 Hypervisor
 
@@ -105,38 +156,56 @@ Examples:
 
 ## Linux Boot Process
 
-The Linux boot sequence consists of:
+When a Linux machine starts, it follows this sequence:
 
-1. Power On
-2. BIOS / UEFI
-3. Bootloader
-4. Linux Kernel
-5. systemd (PID 1)
-6. System Services
-7. User Login
+```text
+Power On
+    ↓
+BIOS / UEFI
+    ↓
+Bootloader
+    ↓
+Kernel
+    ↓
+systemd
+    ↓
+Services
+    ↓
+Login
+```
+
+Once the kernel is loaded, `systemd` starts the required services and prepares the system for use.
 
 ---
 
 ## Linux Processes
 
-A process is a running instance of a program.
+A process is simply a program that is currently running.
 
-Some common process states include:
+Some common process states are:
 
 - Running
 - Sleeping
 - Stopped
 - Zombie
 
-Linux assigns every running process a unique Process ID (PID).
+Every running process has its own **PID (Process ID)**.
 
 ---
 
 ## systemd
 
-`systemd` is the first userspace process started by Linux (PID 1).
+One question I had was:
 
-It is responsible for:
+**Who starts all the services after Linux boots?**
+
+The answer is **systemd**.
+
+It is the first userspace process started by Linux.
+
+PID = 1
+
+Its responsibilities include:
 
 - Starting services
 - Managing services
@@ -147,78 +216,116 @@ It is responsible for:
 Useful command:
 
 ```bash
-systemctl status
+systemctl status nginx
 ```
 
 ---
 
 ## Package Management
 
-Update the package index:
+I always used to confuse these two commands.
+
+### Update
 
 ```bash
 sudo apt-get update
 ```
 
-Downloads the latest package information from the configured repositories.
+Refreshes the package list.
 
-Upgrade installed packages:
+Think:
+
+**"Check what updates are available."**
+
+---
+
+### Upgrade
 
 ```bash
 sudo apt-get upgrade
 ```
 
-Installs the available package updates.
+Installs the available updates.
+
+Think:
+
+**"Install the available updates."**
 
 ---
 
-## Hands-on Lab
+# Hands-on Lab
 
-To reinforce the concepts learned during the session, I completed a simple deployment exercise on AWS.
+Today's session wasn't just about Linux theory.
 
-Tasks completed:
+We also put the concepts into practice by deploying a simple web server on AWS.
+
+Steps we followed:
 
 - Launched an AWS EC2 instance
-- Connected to the instance using SSH
-- Updated the system packages
+- Connected to it using SSH
+- Updated the package list
 - Installed Nginx
 - Started the Nginx service
-- Replaced the default Nginx page with a custom HTML page
-- Accessed the application using the EC2 Public IP
+- Generated a simple HTML landing page using Claude Code
+- Replaced the default Nginx page
+- Accessed the webpage using the EC2 Public IP
 
-This exercise helped connect Linux fundamentals with a real deployment workflow.
-
----
-
-## AI in Action
-
-As part of the deployment exercise, we used **Claude Code** to generate a simple HTML landing page.
-
-Instead of spending time writing HTML from scratch, AI helped generate the webpage quickly, allowing the focus to remain on understanding the deployment process with Linux, AWS, and Nginx.
-
-This was a good example of using AI to improve productivity while still learning the underlying concepts.
+This was my first time connecting Linux concepts with an actual deployment, which made today's session much more interesting.
 
 ---
 
-## Commands Practiced
+# AI in Action
+
+One thing I really liked about today's session was using **Claude Code**.
+
+Instead of spending time writing HTML from scratch, we used AI to generate a simple landing page and focused on understanding the deployment process.
+
+For me, AI didn't replace the learning—it helped speed up a repetitive task so I could spend more time learning Linux, AWS, and Nginx.
+
+---
+
+# Commands Practiced
+
+### Navigation
 
 ```bash
 pwd
 cd
 ls
 ls -a
+```
+
+### File Management
+
+```bash
 mkdir
 touch
+```
+
+### System Information
+
+```bash
 df -h
 free -m
 top
-man ls
+```
 
+### Help
+
+```bash
+man ls
+```
+
+### Package Management
+
+```bash
 sudo apt-get update
 sudo apt-get upgrade
+```
 
-sudo apt install nginx
+### Service Management
 
+```bash
 systemctl status nginx
 sudo systemctl start nginx
 sudo systemctl enable nginx
@@ -226,22 +333,12 @@ sudo systemctl enable nginx
 
 ---
 
-## Additional Notes
+# Key Takeaways
 
-- Ubuntu 24.04 is the latest Long-Term Support (LTS) release.
-- `/bin` contains many essential Linux command binaries.
-- `man` displays the manual page for Linux commands.
-- `sudo` executes commands with superuser privileges.
-- Most production servers run Linux, making Linux fundamentals an essential DevOps skill.
-
----
-
-## Key Takeaways
-
-- Understood the architecture of the Linux operating system.
-- Learned how the Linux boot process works.
-- Revised commonly used Linux commands.
-- Learned the role of `systemd` in managing Linux services.
-- Deployed an Nginx web server on AWS EC2.
-- Used Claude Code to generate a webpage and deployed it successfully.
-- Connected Linux fundamentals with a practical cloud deployment.
+- Linux is built in layers, and each layer has a specific role.
+- The kernel is the core of Linux and handles most of the important work.
+- The shell acts as a bridge between the user and the kernel.
+- `systemd` is responsible for starting and managing services after Linux boots.
+- I finally understood the difference between `apt-get update` and `apt-get upgrade`.
+- Deploying Nginx on an EC2 instance helped me connect Linux concepts with a real-world task.
+- Using Claude Code made the deployment workflow faster while keeping the focus on learning the DevOps concepts.
