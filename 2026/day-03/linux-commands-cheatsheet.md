@@ -1,11 +1,7 @@
 # Linux Commands Cheat Sheet
 
 Day 03 of #90DaysOfDevOps.
-
-These are the commands I keep coming back to, grouped as: file system, processes, and networking. For each one, I wrote
-what I actually use it for, not the textbook definition, so this stays
-easy to scan when something is broken and I'm in a hurry.
-
+My go-to Linux commands, grouped into file system, processes, and networking
 ---
 
 ## File System
