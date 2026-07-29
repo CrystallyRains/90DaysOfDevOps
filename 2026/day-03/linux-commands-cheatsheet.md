@@ -2,8 +2,7 @@
 
 Day 03 of #90DaysOfDevOps.
 
-These are the commands I keep coming back to, grouped the way the task
-asked: file system, processes, and networking. For each one I wrote
+These are the commands I keep coming back to: file system, processes, and networking. For each one, I wrote
 what I actually use it for, not the textbook definition, so this stays
 easy to scan when something is broken and I'm in a hurry.
 
@@ -82,5 +81,4 @@ server reachable? What's using the CPU? Am I out of disk? The commands
 are just how you ask.
 
 I'll keep adding to this file as I hit real problems during the
-challenge, because that's when you find out which commands you
-actually need.
+challenge.
