@@ -1,187 +1,174 @@
-# Day 04 Notes - Processes & Services (My Understanding)
+# Day 04 - Processes and Services
 
-## Goal
+## Overview
 
-The Day 4 task was about understanding:
+Today's goal was to understand how operating systems manage **processes**, **services**, and **logs**.
 
-- Processes
-- Services
-- Logs
-- Basic troubleshooting
+The course uses Linux, but I completed this exercise on my Mac. Although macOS isn't Linux, both operating systems follow the same ideas. The commands are different, but the concepts are very similar.
 
-The course expected Linux (`systemd`), but I was working on macOS.
-
-Instead of memorizing Linux commands, I learned the **concepts** and used the macOS equivalents.
+Instead of memorizing Linux commands, I focused on understanding **what each command is supposed to do** and then used the macOS equivalent.
 
 ---
 
 # Linux vs macOS
 
-Linux uses:
+| Task | Linux | macOS |
+|------|--------|--------|
+| Service Manager | systemd | launchd |
+| Manage Services | systemctl | launchctl |
+| View Service Logs | journalctl | log show |
 
-- systemd
-- systemctl
-- journalctl
+Although the commands are different, all of them help us answer the same questions:
 
-macOS uses:
-
-- launchd
-- launchctl
-- log show
-
-Different commands.
-
-Same concepts.
+- What is running?
+- Who started it?
+- Is it still running?
+- Why did it stop?
+- What do the logs say?
 
 ---
 
-# Step 1 - What is running on my machine?
+# Step 1 - Looking at Running Processes
 
-First I wanted to answer a simple question:
+The first thing I wanted to understand was:
 
-> "What is my computer actually running?"
+> **What is actually running on my computer?**
 
-I used:
+To answer this, I used:
 
 ```bash
 ps aux
 ```
 
-This prints every running process.
+This command displays every running process.
 
-Think of it as:
+A **process** is simply a program that is currently running.
 
-> A list of everything currently alive.
+For example:
 
-Then I used:
+- Opening Google Chrome creates one or more processes.
+- Opening VS Code creates another process.
+- Even the operating system runs hundreds of background processes that we normally never see.
 
-```bash
-top
-```
+When I checked my own machine, I found more than **700 running processes**, even though I only had around 10 applications open.
 
-Unlike `ps`, this updates continuously and shows which processes are using the most CPU or memory.
-
-From `top` I noticed something interesting.
-
-Although I had only around 10 apps open, there were more than **700 processes** running.
-
-Most of them belong to the operating system.
+That taught me that most processes belong to the operating system and background services, not the applications I manually open.
 
 ---
 
-# Step 2 - Spot something unusual
+# Step 2 - Which Processes Are Using Resources?
 
-While reading the output, two processes caught my attention.
+Seeing hundreds of processes isn't very helpful unless we know which ones are actually consuming CPU or memory.
+
+For that, I used:
+
+```bash
+top -l 1 -o mem
+```
+
+Unlike `ps`, which gives a snapshot, `top` shows which processes are using the most system resources.
+
+While reading the output, two processes caught my attention:
 
 - mysqld
 - node
 
-The Node.js process was using around **350 MB** of memory.
-
-I didn't remember starting it.
-
-Instead of assuming it was normal, I investigated.
+I didn't remember starting either of them, so I decided to investigate further.
 
 ---
 
-# Step 3 - Find out what the process actually is
+# Step 3 - Finding the Real Program Behind a Process
 
-I ran:
+At first, I only knew the process name.
+
+However, process names don't always tell the full story.
+
+To see exactly what was running, I used:
 
 ```bash
 ps -p <PID> -o pid,ppid,command
 ```
 
-This showed the **complete command** that started the process.
+This command displays the complete command that launched the process.
 
-I learned something important.
+I discovered that the mysterious `node` process was actually running an **OpenClaw AI Gateway**.
 
-Process names can be misleading.
+That was an important lesson.
 
-The command line tells the real story.
+The process name only tells you **what executable is running**.
 
-The "node" process turned out to be:
-
-OpenClaw Gateway
-
-It wasn't just Node.js.
-
-It was an AI gateway running in the background.
+The complete command tells you **what that executable is actually doing**.
 
 ---
 
-# Step 4 - Is it listening on a network port?
+# Step 4 - Is the Process Listening on the Network?
 
-Next question:
+The next question was:
 
-> Is this process communicating over the network?
+> Is this process accepting network connections?
 
-I used:
+To find out, I used:
 
 ```bash
 lsof -i :18789
 ```
 
-This showed that the process was listening on port **18789**.
+This showed that the process was listening on **localhost:18789**.
 
-Then I confirmed it by running:
+I confirmed it by sending a request using:
 
 ```bash
 curl -I http://localhost:18789
 ```
 
-The server replied with:
+The server responded successfully.
 
-HTTP 200 OK
+This confirmed two things:
 
-So I confirmed:
+- the process was running
+- it was actively accepting connections
 
-- the process was alive
-- it was accepting connections
+I also noticed it was bound to **localhost**.
 
----
+That means only my own computer could access it.
 
-# Step 5 - Learn about services
-
-Processes can disappear.
-
-Services are different.
-
-A service is a program that the operating system manages.
-
-If it crashes,
-
-the service manager can automatically restart it.
-
-Linux uses:
-
-systemd
-
-macOS uses:
-
-launchd
+If it had been bound to all network interfaces, other machines could have reached it as well.
 
 ---
 
-# Step 6 - List running services
+# Step 5 - Understanding Services
 
-I used:
+This exercise also helped me understand the difference between a **process** and a **service**.
+
+A process is something that is currently running.
+
+A service is a program managed by the operating system.
+
+If a service crashes, the operating system can automatically start it again.
+
+On Linux, this is handled by **systemd**.
+
+On macOS, it is handled by **launchd**.
+
+Different names, but the same responsibility.
+
+---
+
+# Step 6 - Listing Services
+
+To see the services managed by macOS, I used:
 
 ```bash
 launchctl list
 ```
 
-Then searched for MySQL.
+I searched for MySQL but couldn't find it.
 
-Nothing appeared.
+At first, I thought MySQL wasn't running as a service.
 
-At first I thought MySQL wasn't a service.
+Later, I realised my mistake.
 
-That was wrong.
-
-The real reason:
-
-I was only viewing **my own user's services**.
+The command was only showing services running under my own user account.
 
 After running:
 
@@ -189,175 +176,122 @@ After running:
 sudo launchctl list
 ```
 
-I found MySQL immediately.
+I found the MySQL service immediately.
 
-Lesson:
+This taught me an important troubleshooting lesson.
 
-"No output" doesn't always mean something doesn't exist.
+If a command doesn't show what you're expecting, it doesn't always mean something is missing.
 
 Sometimes you're simply looking in the wrong place.
 
 ---
 
-# Step 7 - What starts automatically?
+# Step 7 - Checking What Starts Automatically
 
-I listed my LaunchAgents.
+I also wanted to know which programs automatically start when I log into my computer.
+
+For that, I checked:
 
 ```bash
 ls ~/Library/LaunchAgents
 ```
 
-This showed several programs that automatically start whenever I log in.
+This listed several LaunchAgent files.
 
-Two surprised me.
+Among them were:
 
 - OpenClaw
 - Hermes
+- Google Updater
 
-I never realised they were automatically starting.
+I hadn't realised these programs were configured to start automatically.
 
 ---
 
-# Step 8 - Read the service definition
+# Step 8 - Reading the Service Configuration
 
-Each service had a `.plist` file.
+Each LaunchAgent contains a `.plist` file.
 
 This is similar to a Linux systemd unit file.
 
-Inside I found:
+Inside the OpenClaw configuration, I found:
 
-RunAtLoad = true
+- `RunAtLoad = true`
+- `KeepAlive = true`
 
-Meaning:
+`RunAtLoad` means the service starts automatically when I log in.
 
-Start automatically.
+`KeepAlive` means that if the process stops, launchd automatically starts it again.
 
-I also found:
+This explained why simply killing the process wouldn't permanently stop it.
 
-KeepAlive = true
-
-Meaning:
-
-If I kill the process,
-
-launchd will simply start it again.
-
-That taught me something very important.
-
-You don't stop services by killing the process.
-
-You stop the **service manager**.
+The service manager would immediately restart it.
 
 ---
 
-# Step 9 - Read logs
+# Step 9 - Looking at Logs
 
-I practiced two kinds of logs.
+Logs record what the operating system and applications have been doing.
 
-Live system logs
+I explored two different types of logs.
+
+Live system logs:
 
 ```bash
 log show --last 1m
 ```
 
-Traditional log files
+Traditional log files:
 
 ```bash
 tail -n 10 /var/log/install.log
 ```
 
-Logs tell you:
+These logs showed recent network activity and even confirmed that my Mac had recently checked for operating system updates.
 
-- what happened
-- when it happened
-- which program did it
-
-They're usually the first place to look when something goes wrong.
+Logs are often the best place to start when investigating a problem because they explain **what happened before you noticed something was wrong**.
 
 ---
 
-# Step 10 - Remove the service properly
+# Step 10 - Removing an Unwanted Service
 
-Instead of doing:
+Since I no longer needed the OpenClaw and Hermes services, I removed them correctly.
 
-```bash
-kill
-```
+Instead of killing the running process, I:
 
-I used launchctl.
+1. Stopped the service using `launchctl`.
+2. Removed the LaunchAgent registration.
+3. Uninstalled the software.
+4. Verified that the service, process, and listening port were all gone.
 
-First:
+This reinforced another important lesson.
 
-bootout
+Whenever you make changes to a system, don't assume they worked.
 
-Then:
-
-removed the LaunchAgent
-
-Then:
-
-removed the software itself
-
-Finally:
-
-verified everything was gone.
-
-Verification is important.
-
-Never assume something worked.
-
-Always check.
+Always verify the result.
 
 ---
 
-# Biggest lessons
+# Key Takeaways
 
-## Processes are not services.
+By the end of today's exercise, I understood:
 
-A process is something currently running.
-
-A service is something the operating system manages.
-
----
-
-## Process names can be misleading.
-
-Always inspect the full command.
+- A **process** is a running program.
+- A **service** is a program managed by the operating system.
+- Service managers (systemd or launchd) automatically start and monitor services.
+- The full command is often more useful than the process name.
+- Logs help explain what happened before an issue occurred.
+- Background services can start automatically without you remembering they were installed.
+- Verifying your changes is just as important as making them.
 
 ---
 
-## Services can restart themselves.
-
-If KeepAlive or Restart is enabled,
-
-killing the process isn't enough.
-
----
-
-## Logs explain what happened.
-
-Commands only show the current state.
-
-Logs explain the history.
-
----
-
-## Always verify.
-
-Don't trust.
-
-Check.
-
-Use commands to confirm your changes.
-
----
-
-# Commands I used
+# Commands I Practiced
 
 ```bash
 ps aux
 top
-ps -p PID -o pid,ppid,command
+ps -p <PID> -o pid,ppid,command
 lsof -i :PORT
 curl -I
 launchctl list
@@ -373,8 +307,8 @@ which
 
 ---
 
-# One sentence summary
+# Final Thoughts
 
-Today wasn't really about memorizing commands.
+This exercise wasn't just about learning commands.
 
-It was about learning how to investigate an unknown process, understand the service managing it, inspect its logs, remove it correctly, and verify every step afterwards.
+It was about understanding how an operating system manages processes and services, how to investigate something unfamiliar, and how to make changes safely while verifying every step.
