@@ -83,25 +83,24 @@ I didn't remember starting either of them, so I decided to investigate further.
 
 # Step 3 - Finding the Real Program Behind a Process
 
-At first, I only knew the process name.
-
-However, process names don't always tell the full story.
-
+At first, I only knew the process name. However, process names don't always tell the full story.
 To see exactly what was running, I used:
 
 ```bash
 ps -p <PID> -o pid,ppid,command
 ```
+Command Breakdown
+- ps: Invokes the process status utility to report a snapshot of current active processes.
+- -p <PID>: Filters the output to inspect only the process matching the specified numerical ID.
+- -o: Defines a custom output format by specifying exact data columns to print.
+- pid, ppid, command: Specifies the three columns to display:
+    - pid: The unique Process ID of the target.
+    - ppid: The Parent Process ID (the process that spawned this target).
+    - command: The complete command name, execution arguments, and binary path used to start it.
 
-This command displays the complete command that launched the process.
+This command displays the complete command that launched the process. I discovered that the mysterious `node` process was actually running an **OpenClaw AI Gateway**.
 
-I discovered that the mysterious `node` process was actually running an **OpenClaw AI Gateway**.
-
-That was an important lesson.
-
-The process name only tells you **what executable is running**.
-
-The complete command tells you **what that executable is actually doing**.
+That was an important lesson. The process name only tells you **what executable is running**. The complete command tells you **what that executable is actually doing**.
 
 ---
 
@@ -117,26 +116,18 @@ To find out, I used:
 lsof -i :18789
 ```
 
-This showed that the process was listening on **localhost:18789**.
-
-I confirmed it by sending a request using:
+This showed that the process was listening on **localhost:18789**. I confirmed it by sending a request using:
 
 ```bash
 curl -I http://localhost:18789
 ```
 
-The server responded successfully.
-
-This confirmed two things:
+The server responded successfully, this confirmed two things:
 
 - the process was running
 - it was actively accepting connections
 
-I also noticed it was bound to **localhost**.
-
-That means only my own computer could access it.
-
-If it had been bound to all network interfaces, other machines could have reached it as well.
+I also noticed it was bound to **localhost**. That means only my own computer could access it. If it had been bound to all network interfaces, other machines could have reached it as well.
 
 ---
 
@@ -150,11 +141,7 @@ A service is a program managed by the operating system.
 
 If a service crashes, the operating system can automatically start it again.
 
-On Linux, this is handled by **systemd**.
-
-On macOS, it is handled by **launchd**.
-
-Different names, but the same responsibility.
+On Linux, this is handled by **systemd**. On macOS, it is handled by **launchd**. Different names, but the same responsibility.
 
 ---
 
@@ -166,35 +153,23 @@ To see the services managed by macOS, I used:
 launchctl list
 ```
 
-I searched for MySQL but couldn't find it.
-
-At first, I thought MySQL wasn't running as a service.
-
-Later, I realised my mistake.
-
-The command was only showing services running under my own user account.
-
+I searched for MySQL but couldn't find it. At first, I thought MySQL wasn't running as a service.
+Later, I realised my mistake. The command was only showing services running under my own user account.
 After running:
 
 ```bash
 sudo launchctl list
 ```
 
-I found the MySQL service immediately.
+I found the MySQL service immediately, this taught me an important troubleshooting lesson.
 
-This taught me an important troubleshooting lesson.
-
-If a command doesn't show what you're expecting, it doesn't always mean something is missing.
-
-Sometimes you're simply looking in the wrong place.
+If a command doesn't show what you're expecting, it doesn't always mean something is missing. Sometimes you're simply looking in the wrong place.
 
 ---
 
 # Step 7 - Checking What Starts Automatically
 
-I also wanted to know which programs automatically start when I log into my computer.
-
-For that, I checked:
+I also wanted to know which programs automatically start when I log into my computer. For that, I checked:
 
 ```bash
 ls ~/Library/LaunchAgents
@@ -214,9 +189,7 @@ I hadn't realised these programs were configured to start automatically.
 
 # Step 8 - Reading the Service Configuration
 
-Each LaunchAgent contains a `.plist` file.
-
-This is similar to a Linux systemd unit file.
+Each LaunchAgent contains a `.plist` file. This is similar to a Linux systemd unit file.
 
 Inside the OpenClaw configuration, I found:
 
@@ -227,17 +200,13 @@ Inside the OpenClaw configuration, I found:
 
 `KeepAlive` means that if the process stops, launchd automatically starts it again.
 
-This explained why simply killing the process wouldn't permanently stop it.
-
-The service manager would immediately restart it.
+This explained why simply killing the process wouldn't permanently stop it. The service manager would immediately restart it.
 
 ---
 
 # Step 9 - Looking at Logs
 
-Logs record what the operating system and applications have been doing.
-
-I explored two different types of logs.
+Logs record what the operating system and applications have been doing. I explored two different types of logs.
 
 Live system logs:
 
