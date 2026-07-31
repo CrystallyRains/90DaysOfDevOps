@@ -1,291 +1,141 @@
 # Linux Troubleshooting Runbook — mysqld
 
-**Day 05 of #90DaysOfDevOps**
+Day 05 of #90DaysOfDevOps.
 
-## Overview
+Target: **mysqld** (MySQL Community Server 9.5.0) — a service I found
+running on my machine during Day 4's audit and decided to investigate
+properly. Machine is a Mac (Darwin arm64), so a few commands are the
+macOS equivalents the task suggests (`vm_stat`, `log show`).
 
-For today's troubleshooting drill, I chose **mysqld (MySQL Community Server 9.5.0)** as my target service. I first noticed it during Day 4 while exploring the processes running on my machine. Rather than stopping it immediately, I wanted to understand whether it was healthy, what resources it was using, where it was logging, and whether there were any signs of a problem.
-
-The goal of this runbook isn't to fix a broken service. It's to follow a repeatable troubleshooting process that I could use during a real incident.
-
----
-
-# Target Service
-
-**Service:** `mysqld`
-
-**Why this service?**
-
-It was already running on my machine, making it a good candidate for practicing a real troubleshooting workflow instead of creating an artificial example.
+Every output below is real, from my machine.
 
 ---
 
-# 1. Environment Check
+## Environment basics
 
-## Why am I checking this?
-
-Before troubleshooting any service, it's useful to know what operating system I'm working on. Different operating systems store logs, manage services, and organize files differently.
-
-## Commands
-
-```bash
-uname -a
-sw_vers
 ```
-
-## Understanding the commands
-
-- `uname -a`
-  - `uname` means **Unix Name**.
-  - `-a` displays detailed system information, including the kernel and processor architecture.
-
-- `sw_vers`
-  - Shows the installed macOS version.
-
-## My Output
-
-```text
 $ uname -a
 Darwin ... 25.5.0 ... RELEASE_ARM64_T8132 arm64
-
 $ sw_vers
 macOS 26.5.1 (25F80)
 ```
+Note: always capture this first — "what OS/arch am I on" decides which
+commands and paths apply for everything after it.
 
-## Interpretation
+## Filesystem sanity
 
-The machine is running macOS on Apple Silicon (`arm64`). Knowing the operating system helps me choose the correct troubleshooting commands later in the investigation.
-
----
-
-# 2. Filesystem Sanity Check
-
-## Why am I checking this?
-
-If the filesystem is read-only or completely full, applications may fail to start or save data correctly. Before blaming the application, it's worth confirming that basic file operations work.
-
-## Commands
-
-```bash
-mkdir -p /tmp/runbook-demo
-cp /etc/hosts /tmp/runbook-demo/hosts-copy
-ls -l /tmp/runbook-demo
 ```
-
-## Understanding the commands
-
-- `mkdir` creates a directory.
-- `-p` creates the directory only if it doesn't already exist.
-- `cp` copies a file.
-- `ls -l` lists files with details like permissions, owner and size.
-
-## My Output
-
-```text
--rw-r--r-- 1 snigdha wheel 213 Jul 31 11:39 hosts-copy
+$ mkdir -p /tmp/runbook-demo && cp /etc/hosts /tmp/runbook-demo/hosts-copy && ls -l /tmp/runbook-demo
+-rw-r--r--  1 snigdha  wheel  213 31 Jul 11:39 hosts-copy
 ```
+Note: can I create and copy files? Yes — rules out a full/read-only
+disk before I trust anything else.
 
-## Interpretation
+## Snapshot: CPU & Memory
 
-The filesystem behaved normally. I was able to create a directory, copy a file, and verify that it existed afterwards. This rules out obvious filesystem issues before moving on.
-
----
-
-# 3. CPU & Memory Snapshot
-
-## Why am I checking this?
-
-If a service is slow or unresponsive, one of the first things to check is whether it's consuming excessive CPU or memory.
-
-## Commands
-
-```bash
-ps -o pid,pcpu,pmem,etime,comm -p $(pgrep -x mysqld)
-vm_stat | head -8
 ```
-
-## Understanding the commands
-
-- `ps` displays information about running processes.
-- `pgrep -x mysqld` finds the PID of the MySQL process.
-- `pid` is the Process ID.
-- `pcpu` shows CPU usage.
-- `pmem` shows memory usage.
-- `etime` shows how long the process has been running.
-- `comm` displays the executable name.
-- `vm_stat` shows memory statistics for macOS.
-
-## My Output
-
-```text
-PID   %CPU %MEM ELAPSED COMM
-562   0.2  2.3   19:11 /usr/local/mysql/bin/mysqld
+$ ps -o pid,pcpu,pmem,etime,comm -p $(pgrep -x mysqld)
+  PID  %CPU %MEM ELAPSED COMM
+  562   0.2  2.3   19:11 /usr/local/mysql/bin/mysqld
+$ vm_stat | head -8
+Pages free: 7309.   Pages active: 421880.   Pages wired down: 130327. ...
 ```
+Notes: mysqld is idle — 0.2% CPU, 2.3% memory, up 19 minutes (since
+boot). Yesterday its PID was 573, today 562: PIDs change across
+restarts, which is why runbooks track services by name/label, never by
+PID. vm_stat shows low free pages but that's normal on macOS — unused
+RAM gets used as cache.
 
-## Interpretation
+## Snapshot: Disk & IO
 
-MySQL was almost idle, using only **0.2% CPU** and **2.3% memory**. The service had been running since boot and showed no signs of resource pressure.
-
-I also noticed the PID had changed compared to the previous day. This reminded me that PIDs change whenever a process restarts, so it's better to identify services by their name rather than by a specific PID.
-
----
-
-# 4. Disk & I/O Check
-
-## Why am I checking this?
-
-Databases constantly read and write data. If the disk is almost full or experiencing heavy I/O, performance problems are likely to follow.
-
-## Commands
-
-```bash
-df -h /
-sudo du -sh /usr/local/mysql/data
-iostat
 ```
-
-## Understanding the commands
-
-- `df -h` shows total, used and available disk space.
-- `du -sh` shows the size of a specific directory.
-- `iostat` displays disk activity and system load.
-
-## My Output
-
-```text
-Disk Available: 18 GiB
-MySQL Data Directory: 201 MB
+$ df -h /
+/dev/disk3s1s1   228Gi   12Gi   18Gi   40%   /
+$ sudo du -sh /usr/local/mysql/data
+201M    /usr/local/mysql/data
+$ iostat
+    KB/t  tps  MB/s  us sy id   1m   5m   15m
+   20.65  852 17.18  25 11 64  1.65 5.07 6.98
 ```
+Notes: MySQL's data is a modest 201M — not a disk risk itself. But
+only **18Gi available on the whole disk**, which is a genuine
+watch-item (below ~10% free, machines misbehave). Load averages
+falling from 6.98 → 1.65 tell a story: heavy work during boot,
+settling now.
 
-## Interpretation
+## Snapshot: Network
 
-The MySQL data directory is relatively small, so the database itself isn't consuming much storage.
-
-However, the entire system only has **18 GB** of free space remaining. While this isn't immediately critical, it's something worth monitoring because databases don't perform well when disks become nearly full.
-
----
-
-# 5. Network Check
-
-## Why am I checking this?
-
-Even if a service is running, clients won't be able to use it unless it's listening on the expected network port.
-
-## Commands
-
-```bash
-lsof -i :3306
-nc -vz localhost 3306
-sudo lsof -i :3306
 ```
-
-## Understanding the commands
-
-- `lsof` shows which process owns a file or network socket.
-- `-i :3306` filters the output to port 3306.
-- `nc` (Netcat) attempts to connect to a network port.
-- `sudo` allows me to view processes owned by other users.
-
-## My Output
-
-```text
-lsof
+$ lsof -i :3306
 (empty)
-
-nc
-Connection to localhost port 3306 succeeded.
-
-sudo lsof
-mysqld ... TCP *:3306 (LISTEN)
+$ nc -vz localhost 3306
+Connection to localhost port 3306 [tcp/mysql] succeeded!
+$ sudo lsof -i :3306
+mysqld  562 _mysql ... TCP *:mysql (LISTEN)
 ```
+Notes: the contradiction was the lesson. Plain lsof showed nothing,
+but nc proved the port answers — because without sudo, lsof only
+shows processes *you* own, and mysqld runs as `_mysql`. "Empty
+output" meant "wrong permissions", not "port free".
 
-## Interpretation
+**Finding:** mysqld listens on `*:3306` — all interfaces, not just
+localhost. The log also shows an X Plugin on port 33060, bind-address
+`::` (all interfaces again). On shared Wi-Fi this exposes the database
+port to the network. It has auth and the macOS firewall in front of
+it, but it should still be bound to 127.0.0.1 on a laptop.
 
-At first this looked confusing.
+## Logs reviewed
 
-`lsof` showed nothing, but `nc` successfully connected.
-
-The reason was permissions. MySQL runs as the `_mysql` user, so running `lsof` without `sudo` couldn't see its network socket.
-
-I also noticed MySQL was listening on `*:3306`, meaning it accepts connections on all network interfaces instead of only `localhost`. For a personal development machine, restricting it to localhost would usually be a safer choice.
-
----
-
-# 6. Logs Review
-
-## Why am I checking this?
-
-Resource usage tells me what is happening right now.
-
-Logs tell me what happened before I started investigating.
-
-## Commands
-
-```bash
-log show --last 5m --predicate 'process == "mysqld"'
-sudo tail -n 15 /usr/local/mysql/data/mysqld.local.err
 ```
+$ log show --last 5m --predicate 'process == "mysqld"' | tail -5
+(empty)
+$ sudo ls -lh /usr/local/mysql/data/ | grep -i err
+-rw-r-----  1 _mysql  _mysql  452K 31 Jul 11:20 mysqld.local.err
+$ sudo tail -n 15 /usr/local/mysql/data/mysqld.local.err
+2026-07-30T17:50:48Z ... Received SHUTDOWN from user <via user signal>.
+2026-07-31T05:50:35Z ... MySQL Server - start.
+2026-07-31T05:50:36Z ... starting as process 562
+2026-07-31T05:50:38Z ... InnoDB initialization has ended.
+2026-07-31T05:50:38Z ... X Plugin ready ... Bind-address: '::' port: 33060
+2026-07-31T05:50:38Z ... ready for connections. Version: '9.5.0' port: 3306
+```
+Notes: the OS unified log had nothing for mysqld — MySQL writes its
+own file, `mysqld.local.err` in its data directory. Not every service
+logs where the OS logs; the runbook's job is to record *where*. The
+log shows a clean shutdown last night, clean 2-second startup at
+today's boot, and two ignorable warnings (case-insensitive filesystem,
+self-signed cert). Healthy service.
 
-## Understanding the commands
+## Quick findings
 
-- `log show` displays entries from macOS's unified logging system.
-- `tail -n 15` displays the last 15 lines of a log file.
+1. mysqld is healthy and idle: clean start/stop history, near-zero
+   CPU, 201M of data, fast InnoDB init.
+2. It is listening on **all interfaces** (3306 and 33060) — should be
+   localhost-only on a laptop. This is the actionable finding.
+3. Disk: 18Gi available system-wide — worth watching, unrelated to
+   MySQL.
+4. Two tool gotchas that would cost real time in an incident: lsof
+   needs sudo to see other users' sockets, and MySQL bypasses the
+   system log entirely.
 
-## My Output
+## If this worsens (next steps)
 
-The unified system log didn't contain any MySQL entries.
-
-The MySQL error log showed:
-
-- Clean shutdown
-- Successful startup
-- InnoDB initialized correctly
-- Server ready for connections
-
-## Interpretation
-
-This taught me that not every application writes to the operating system's central logging system.
-
-MySQL maintains its own log file, and that's where I found the information I needed.
-
-The logs showed a healthy startup with no critical errors.
+1. **Exposure:** add `bind_address=127.0.0.1` (and
+   `mysqlx_bind_address=127.0.0.1`) to my.cnf and restart via the
+   supervisor — or, if I confirm nothing on this machine uses MySQL,
+   decommission it properly like the Day 4 services: stop via
+   launchd, then uninstall. Never just `kill` a supervised service.
+2. **Disk:** if Avail drops toward 10Gi — `du -sh` the big
+   directories, clear caches/old projects; a full disk takes MySQL
+   and everything else down with it.
+3. **If CPU/memory ever spikes:** capture evidence *before*
+   restarting — `ps` snapshot, `SHOW PROCESSLIST` inside MySQL to see
+   the running queries, and tail the error log. Restart is the last
+   step, not the first, and it goes through the supervisor so the
+   evidence (logs) survives.
 
 ---
 
-# Quick Findings
-
-- MySQL is healthy and using very little CPU or memory.
-- The database occupies only about **201 MB** of storage.
-- The service started successfully and the logs contain no critical errors.
-- MySQL is listening on **all network interfaces**, which is something I would change on a personal development machine.
-- Running `lsof` without `sudo` can hide services owned by another user, so an empty result doesn't always mean nothing is running.
-
----
-
-# If This Worsens
-
-If MySQL starts showing problems in the future, these would be my next steps:
-
-1. Restrict MySQL to `localhost` by updating the configuration if remote access isn't required.
-2. Monitor available disk space and clean up storage before the disk becomes critically full.
-3. If CPU or memory usage suddenly increases, capture evidence first (`ps`, logs, and `SHOW PROCESSLIST`) before restarting the service.
-
----
-
-# What I Learned
-
-Today's exercise taught me that troubleshooting isn't about finding one magic command.
-
-It's about collecting evidence in a logical order.
-
-Instead of jumping straight to restarting a service, I learned to:
-
-- identify the environment,
-- verify the filesystem,
-- check CPU and memory usage,
-- inspect disk and network health,
-- review logs,
-- interpret the evidence,
-- and only then decide what action to take.
-
-That's a workflow I can reuse whenever I troubleshoot another service, whether it's MySQL, Docker, Nginx, or any future application.
+The habit this drill builds: snapshot → interpret → only then act.
+Every command here took seconds; knowing which output is normal and
+which isn't is the actual skill.
