@@ -67,6 +67,10 @@ top -l 1 -o mem
 ```
 
 Unlike `ps`, which gives a snapshot, `top` shows which processes are using the most system resources.
+Command Breakdown: 
+- top: Invokes the display of real-time system usage statistics.
+- -l 1: Specifies the number of samples (or iterations) to take. Setting it to 1 forces the command to print a non-interactive, static snapshot and then instantly terminate.
+- -o mem: Instructs the utility to sort the output processes in descending order based on their physical memory footprint (mem).
 
 While reading the output, two processes caught my attention:
 
