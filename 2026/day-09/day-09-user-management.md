@@ -1,279 +1,573 @@
-# Day 09 – Linux User & Group Management
----
+# Task 4 – Shared Directory (Explained Simply)
 
-## Users & Groups Created
+## Goal
 
-**Users:** `tokyo`, `berlin`, `professor`, `nairobi`
-**Groups:** `developers`, `admins`, `project-team`
+Suppose two developers are working on the same project.
 
-## Group Assignments
+- Tokyo creates files.
+- Berlin also needs to edit those files.
 
-| User | Primary group | Secondary groups |
-|---|---|---|
-| tokyo | tokyo | developers, project-team |
-| berlin | berlin | developers, admins |
-| professor | professor | admins |
-| nairobi | nairobi | project-team |
-
-Verified with `id`:
-
-```
-uid=1001(tokyo) gid=1001(tokyo) groups=1001(tokyo),1004(developers),1007(project-team)
-uid=1002(berlin) gid=1002(berlin) groups=1002(berlin),1004(developers),1005(admins)
-uid=1003(professor) gid=1003(professor) groups=1003(professor),1005(admins)
-```
-
-
-
-## Directories Created
-
-| Path | Owner:Group | Mode | Why |
-|---|---|---|---|
-| `/opt/dev-project` | root:developers | 2775 | setgid so new files inherit the developers group |
-| `/opt/team-workspace` | root:project-team | 3775 | setgid + sticky bit |
+So we need a folder that both of them can use.
 
 ---
 
-## Task 1 – Create Users
-
-```bash
-sudo useradd -m -s /bin/bash tokyo
-sudo useradd -m -s /bin/bash berlin
-sudo useradd -m -s /bin/bash professor
-sudo passwd tokyo      # repeated for berlin and professor
-```
-
-- `-m` creates the home directory. Without it the user exists but has nowhere to live.
-- `-s /bin/bash` sets a usable login shell. The default is `/bin/sh`.
-
-Verified with `tail -4 /etc/passwd` and `ls -l /home`.
-
-**What went wrong:** my first `useradd` for tokyo got interrupted, and tokyo ended up with `/bin/sh` while the others had bash:
-
-```
-tokyo:x:1001:1001::/home/tokyo:/bin/sh
-berlin:x:1002:1002::/home/berlin:/bin/bash
-```
-
-Fixed without recreating the user:
-
-```bash
-sudo usermod -s /bin/bash tokyo
-```
-
-<img width="1182" height="829" alt="Screenshot 2026-08-04 at 8 19 26 PM" src="https://github.com/user-attachments/assets/4aa1e1df-f1b8-40d7-9a7e-bcd46a8e0888" />
-
-## Task 2 – Create Groups
-
-```bash
-sudo groupadd developers
-sudo groupadd admins
-getent group developers admins
-```
-
-```
-developers:x:1004:
-admins:x:1005:
-```
-
-`getent group` reads the group database properly. `tail /etc/group` also works — but note the file is `/etc/group`, not `/etc/grp`.
-
-## Task 3 – Assign Users to Groups
-
-```bash
-sudo gpasswd -a tokyo developers
-sudo gpasswd -a berlin developers
-sudo gpasswd -a berlin admins
-sudo usermod -aG admins professor
-```
-
-**What went wrong:** I tried to add berlin to both groups in one `gpasswd` command. Neither of these works:
-
-```bash
-sudo gpasswd -a berlin developers admins     # usage error
-sudo gpasswd -a berlin developers,admins     # group 'developers,admins' does not exist
-```
-
-`gpasswd -a` takes exactly one group. The command that accepts a comma-separated list is:
-
-```bash
-sudo usermod -aG developers,admins berlin
-```
-
-`-a` means **append**. `usermod -G` without the `-a` replaces every secondary group the user has — that's how people accidentally remove themselves from `sudo` and lock themselves out of a server.
-
-Verified with `id berlin` rather than `groups berlin`, because `id` shows the primary group separately from the secondary ones.
-
-## Task 4 – Shared Directory (the interesting one)
+# Step 1 – Create the Folder
 
 ```bash
 sudo mkdir /opt/dev-project
-sudo chgrp developers /opt/dev-project
-sudo chmod 775 /opt/dev-project
-sudo -u tokyo touch /opt/dev-project/tokyo-notes.txt
-ls -l /opt/dev-project
 ```
 
+### What does this do?
+
+Creates a new directory called:
+
 ```
--rw-r--r-- 1 tokyo tokyo 0 Aug  4 14:55 tokyo-notes.txt
+/opt/dev-project
 ```
 
-The directory is `775 developers`, but the file inside it landed as **tokyo:tokyo, mode 644**. So:
+Right now, only **root** owns this folder.
+
+---
+
+# Step 2 – Change the Folder's Group
 
 ```bash
-sudo -u berlin sh -c 'echo hi >> /opt/dev-project/tokyo-notes.txt'
-sh: 1: cannot create /opt/dev-project/tokyo-notes.txt: Permission denied
+sudo chgrp developers /opt/dev-project
 ```
 
-<img width="1448" height="800" alt="Screenshot 2026-08-04 at 8 39 37 PM" src="https://github.com/user-attachments/assets/71c67606-2bf8-4d5e-aff1-a94408ee642f" />
+## What is `chgrp`?
 
+`chgrp` means:
 
-Berlin is in `developers` and can create files in the directory. Berlin still cannot edit tokyo's file. **Directory permissions control who can add and remove entries. They say nothing about the files inside.**
+> **CHange GRouP**
 
-Two things were missing:
+Every file and folder in Linux has:
+
+- an owner
+- a group
+
+Think of it like this:
+
+```
+Owner : Tokyo
+Group : Developers
+```
+
+By default our folder looked something like:
+
+```
+Owner : root
+Group : root
+```
+
+After running:
+
+```bash
+sudo chgrp developers /opt/dev-project
+```
+
+it becomes
+
+```
+Owner : root
+Group : developers
+```
+
+Now everyone inside the **developers** group can use this folder (depending on permissions).
+
+---
+
+# Step 3 – Give Folder Permissions
+
+```bash
+sudo chmod 775 /opt/dev-project
+```
+
+## What is `chmod`?
+
+`chmod` means
+
+> **CHange MODe**
+
+Mode simply means **permissions**.
+
+---
+
+## Understanding 775
+
+```
+775
+│││
+││└── Others
+│└── Group
+└── Owner
+```
+
+Each number is made from:
+
+| Number | Permission |
+|---------|------------|
+|4|Read|
+|2|Write|
+|1|Execute|
+
+So
+
+```
+7 = 4+2+1
+```
+
+means
+
+```
+Read
+Write
+Execute
+```
+
+while
+
+```
+5 = 4+1
+```
+
+means
+
+```
+Read
+Execute
+```
+
+So
+
+```
+775
+```
+
+means
+
+| Who | Permission |
+|------|------------|
+|Owner|Read Write Execute|
+|Group|Read Write Execute|
+|Others|Read Execute|
+
+---
+
+At this point it looks like everything should work.
+
+Tokyo creates a file.
+
+```bash
+sudo -u tokyo touch /opt/dev-project/tokyo-notes.txt
+```
+
+Berlin is also in the developers group.
+
+So...
+
+Should Berlin be able to edit Tokyo's file?
+
+Most people would say **Yes**.
+
+Linux says...
+
+**No.**
+
+---
+
+# Why Didn't It Work?
+
+Because folder permissions and file permissions are different things.
+
+The folder only decides:
+
+- Can you enter?
+- Can you create files?
+- Can you delete files?
+
+It **does NOT decide who can edit a file.**
+
+Every file has its own permissions.
+
+Tokyo's file looked like:
+
+```
+Owner : tokyo
+Group : tokyo
+Permission : 644
+```
+
+Notice the group.
+
+The file belongs to **tokyo**, not **developers**.
+
+That's why Berlin couldn't edit it.
+
+---
+
+# Problem 1
+
+New files inherit the creator's group.
+
+Instead of
+
+```
+developers
+```
+
+they become
+
+```
+tokyo
+```
+
+We need to change that.
+
+---
+
+# Solution 1 – setgid
 
 ```bash
 sudo chmod 2775 /opt/dev-project
-ls -ld /opt/dev-project
-drwxrwsr-x 2 root developers 4096 Aug  4 14:55 /opt/dev-project
 ```
 
-The leading `2` is the **setgid bit** — the `s` in `drwxrwsr-x`. New files now inherit the directory's group instead of the creator's.
+Notice the extra **2**.
+
+```
+2775
+^
+```
+
+That **2** enables something called **setgid**.
+
+---
+
+## What does setgid do?
+
+Normally
+
+Tokyo creates a file.
+
+```
+shared.txt
+
+Owner : tokyo
+Group : tokyo
+```
+
+After enabling setgid
+
+Tokyo creates a file.
+
+Now Linux says
+
+> "This file is inside a developers folder."
+
+So instead of giving it Tokyo's group,
+
+it automatically gives it
+
+```
+Owner : tokyo
+Group : developers
+```
+
+Every new file now belongs to the folder's group.
+
+That makes collaboration much easier.
+
+---
+
+## Easy Way to Remember
+
+Without setgid
+
+```
+Creator decides the group.
+```
+
+With setgid
+
+```
+Folder decides the group.
+```
+
+---
+
+# Problem 2
+
+Even though the file now belongs to
+
+```
+developers
+```
+
+Berlin still couldn't edit it.
+
+Why?
+
+Because the file permissions were
+
+```
+644
+```
+
+which means
+
+|Owner|Read Write|
+|Group|Read Only|
+|Others|Read Only|
+
+The group still cannot write.
+
+---
+
+# Why Did Linux Create 644?
+
+Linux automatically creates files using something called
+
+```
+umask
+```
+
+---
+
+# What is umask?
+
+Think of umask as
+
+> Linux's default permission filter.
+
+Whenever you create a new file,
+
+Linux first thinks
+
+```
+I'll make it 666.
+```
+
+Meaning
+
+```
+Read + Write
+for everyone.
+```
+
+Then it applies the umask.
+
+Ubuntu's default umask is
+
+```
+022
+```
+
+That removes write permission from
+
+- Group
+- Others
+
+So
+
+```
+666
+```
+
+becomes
+
+```
+644
+```
+
+That's why almost every new file is
+
+```
+644
+```
+
+---
+
+# Changing the umask
 
 ```bash
-sudo -u tokyo sh -c 'umask 002; touch /opt/dev-project/shared.txt'
-ls -l /opt/dev-project
--rw-rw-r-- 1 tokyo developers 0 Aug  4 14:58 shared.txt
+umask 002
 ```
 
-`umask` decides the default permissions on new files. Ubuntu's default of `022` strips group write, producing 644. `002` leaves it, producing 664.
+Now Linux removes write permission only from Others.
 
-setgid fixed **who owns the file**. umask fixed **who can write to it**. Both were needed.
+So
 
-**setgid only applies to new files.** `tokyo-notes.txt` was created before the change and was still broken, so existing files needed fixing separately:
+```
+666
+```
+
+becomes
+
+```
+664
+```
+
+Now the group can also write.
+
+Perfect for shared projects.
+
+---
+
+## Easy Way to Remember
+
+```
+umask
+```
+
+doesn't ADD permissions.
+
+It REMOVES permissions.
+
+---
+
+# What About Old Files?
+
+setgid only affects files created **after** enabling it.
+
+Old files stay unchanged.
+
+So we must fix them manually.
+
+---
+
+## Change the Group
 
 ```bash
 sudo chgrp -R developers /opt/dev-project
+```
+
+The `-R` means
+
+> Recursive
+
+Instead of changing only the folder,
+
+Linux changes
+
+- the folder
+- every file
+- every subfolder
+
+Now everything belongs to the developers group.
+
+---
+
+## Give Group Write Permission
+
+```bash
 sudo chmod -R g+w /opt/dev-project
-sudo -u berlin sh -c 'echo "berlin was here" >> /opt/dev-project/tokyo-notes.txt'
-cat /opt/dev-project/tokyo-notes.txt
 ```
 
+Let's break it down.
 
-**Side note:** running plain `touch tokyo berlin` inside the directory as the `ubuntu` user also failed. Ubuntu isn't in `developers`, so it falls into the "other" bucket — `5` in `775`, which is read and execute but no write.
-
-## Task 5 – Team Workspace
-
-Same setup, done correctly from the start:
-
-```bash
-sudo useradd -m -s /bin/bash nairobi
-sudo passwd nairobi
-sudo groupadd project-team
-sudo usermod -aG project-team nairobi
-sudo usermod -aG project-team tokyo
-id tokyo
-
-sudo mkdir /opt/team-workspace
-sudo chgrp project-team /opt/team-workspace
-sudo chmod 2775 /opt/team-workspace
-
-sudo -u nairobi sh -c 'umask 002; touch /opt/team-workspace/nairobi-file.txt'
-ls -l /opt/team-workspace
--rw-rw-r-- 1 nairobi project-team 0 Aug  4 15:02 nairobi-file.txt
-
-sudo -u tokyo sh -c 'echo "tokyo was here" >> /opt/team-workspace/nairobi-file.txt'
-cat /opt/team-workspace/nairobi-file.txt
+```
+g
 ```
 
-Tokyo's append worked on the first attempt — which was the point of the exercise. Tokyo is also proof that a user can sit in multiple groups at once (`developers` and `project-team`).
+means
 
-Then added the sticky bit:
-
-```bash
-sudo chmod 3775 /opt/team-workspace
-ls -ld /opt/team-workspace
-drwxrwsr-t 2 root project-team 4096 Aug  4 15:02 /opt/team-workspace
+```
+Group
 ```
 
-The `t` at the end is the sticky bit: members can create files but can only delete their **own**. Tested it:
-
-```bash
-sudo -u tokyo rm /opt/team-workspace/nairobi-file.txt
-rm: cannot remove '...': Operation not permitted
+```
++
 ```
 
+means
 
-This is the same mechanism `/tmp` uses.
+```
+Add
+```
+
+```
+w
+```
+
+means
+
+```
+Write permission
+```
+
+So
+
+```
+g+w
+```
+
+means
+
+> Give write permission to the group.
+
+Again,
+
+```
+-R
+```
+
+means
+
+Apply this to everything inside the folder.
 
 ---
 
-## Permission Digit Reference
+Now Berlin can finally edit Tokyo's files.
 
-| Mode | Name | Effect on a shared directory |
-|---|---|---|
-| `0775` | plain | folder access only; files stay private to whoever made them |
-| `2775` | setgid | new files inherit the folder's group |
-| `1775` | sticky | you can only delete your own files |
-| `3775` | setgid + sticky | what a real team workspace should be |
+Mission accomplished.
 
 ---
 
-## Commands Used
+# Final Picture
 
-```bash
-# users
-useradd -m -s /bin/bash <user>
-passwd <user>
-usermod -s /bin/bash <user>
-userdel -r <user>
+Without any changes
 
-# groups
-groupadd <group>
-getent group <group>
-gpasswd -a <user> <group>
-usermod -aG <group1>,<group2> <user>
-id <user>
+```
+Folder
+ └── shared.txt
 
-# permissions
-chgrp <group> <dir>
-chgrp -R <group> <dir>
-chmod 775 / 2775 / 3775 <dir>
-chmod -R g+w <dir>
-umask 002
-ls -l / ls -ld
+Owner : tokyo
+Group : tokyo
+Permission : 644
 
-# testing as another user
-sudo -u <user> <command>
-sudo -u <user> sh -c '<command with redirection>'
+Berlin ❌ Cannot edit
 ```
 
-Note: `sudo -u tokyo echo hi >> file` doesn't do what you'd expect — the redirect runs as your own shell, not as tokyo. Wrapping it in `sh -c '...'` is what makes the write actually happen as that user.
+After
 
----
+- setgid
+- umask 002
+- chgrp
+- chmod
 
-## What I Learned
+we get
 
-1. **`775` is not enough for a shared folder.** The directory mode controls who can add and delete entries; each file inside still carries its own owner and mode. Two teammates in the same group could both create files and still not be able to edit each other's work. `2775` plus `umask 002` is what makes a shared directory behave the way people assume it already does.
+```
+Folder
+ └── shared.txt
 
-2. **setgid is not retroactive.** It only affects files created after it's set. Anything already sitting in the directory needs `chgrp -R` and `chmod -R g+w`. On a real server you almost always inherit files that predate your fix.
+Owner : tokyo
+Group : developers
+Permission : 664
 
-3. **`-a` matters more than anything else in `usermod`.** `usermod -aG` appends; `usermod -G` silently replaces every secondary group. Dropping the `-a` on your own account is a good way to remove yourself from `sudo` and lose access to the box.
-
----
-
-## Cleanup
-
-```bash
-sudo userdel -r tokyo
-sudo userdel -r berlin
-sudo userdel -r professor
-sudo userdel -r nairobi
-sudo rm -rf /opt/dev-project /opt/team-workspace
+Berlin Can edit
 ```
 
-EC2 instance terminated afterwards.
-
 ---
 
-Part of the #90DaysOfDevOps challenge — #DevOpsKaJosh #TrainWithShubham
+# Quick Revision
+
+| Command | Simple Meaning |
+|----------|----------------|
+|`mkdir`|Create a folder|
+|`chgrp developers folder`|Change the folder's group|
+|`chmod 775 folder`|Give folder permissions|
+|`chmod 2775 folder`|Enable setgid so new files inherit the folder's group|
+|`umask 002`|Allow the group to have write permission on new files|
+|`chgrp -R developers folder`|Change group of everything inside|
+|`chmod -R g+w folder`|Give write permission to the group for everything inside|
