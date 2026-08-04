@@ -26,7 +26,7 @@ uid=1002(berlin) gid=1002(berlin) groups=1002(berlin),1004(developers),1005(admi
 uid=1003(professor) gid=1003(professor) groups=1003(professor),1005(admins)
 ```
 
-_[screenshot: id output for all users]_
+
 
 ## Directories Created
 
@@ -64,7 +64,7 @@ Fixed without recreating the user:
 sudo usermod -s /bin/bash tokyo
 ```
 
-_[screenshot: /etc/passwd before and after]_
+<img width="1182" height="829" alt="Screenshot 2026-08-04 at 8 19 26 PM" src="https://github.com/user-attachments/assets/4aa1e1df-f1b8-40d7-9a7e-bcd46a8e0888" />
 
 ## Task 2 – Create Groups
 
@@ -128,7 +128,8 @@ sudo -u berlin sh -c 'echo hi >> /opt/dev-project/tokyo-notes.txt'
 sh: 1: cannot create /opt/dev-project/tokyo-notes.txt: Permission denied
 ```
 
-_[screenshot: the permission denied error]_
+<img width="1448" height="800" alt="Screenshot 2026-08-04 at 8 39 37 PM" src="https://github.com/user-attachments/assets/71c67606-2bf8-4d5e-aff1-a94408ee642f" />
+
 
 Berlin is in `developers` and can create files in the directory. Berlin still cannot edit tokyo's file. **Directory permissions control who can add and remove entries. They say nothing about the files inside.**
 
@@ -161,7 +162,6 @@ sudo -u berlin sh -c 'echo "berlin was here" >> /opt/dev-project/tokyo-notes.txt
 cat /opt/dev-project/tokyo-notes.txt
 ```
 
-_[screenshot: same append succeeding after the fix]_
 
 **Side note:** running plain `touch tokyo berlin` inside the directory as the `ubuntu` user also failed. Ubuntu isn't in `developers`, so it falls into the "other" bucket — `5` in `775`, which is read and execute but no write.
 
@@ -206,7 +206,6 @@ sudo -u tokyo rm /opt/team-workspace/nairobi-file.txt
 rm: cannot remove '...': Operation not permitted
 ```
 
-_[screenshot: sticky bit blocking the delete]_
 
 This is the same mechanism `/tmp` uses.
 
