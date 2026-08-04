@@ -1,7 +1,4 @@
 # Day 09 – Linux User & Group Management
-
-Done on a fresh Ubuntu 26.04 EC2 instance (t3.micro), since macOS doesn't have `useradd`.
-
 ---
 
 ## Users & Groups Created
