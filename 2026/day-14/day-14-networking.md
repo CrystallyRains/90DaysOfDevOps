@@ -71,7 +71,8 @@ L1  Physical
 Add the OSI/TCP-IP image here. Keep the image in the same folder as this
 Markdown file.
 
-![Uploading Screenshot 2026-08-11 at 6.05.10 PM.png…]()
+<img width="1596" height="1120" alt="Screenshot 2026-08-11 at 6 06 33 PM" src="https://github.com/user-attachments/assets/ae61543b-4403-4664-b4c5-c9d19b1603f2" />
+
 
 ------------------------------------------------------------------------
 
