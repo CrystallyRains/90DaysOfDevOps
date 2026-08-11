@@ -71,7 +71,7 @@ L1  Physical
 Add the OSI/TCP-IP image here. Keep the image in the same folder as this
 Markdown file.
 
-![OSI vs TCP/IP Model](./osi-vs-tcpip.png)
+![Uploading Screenshot 2026-08-11 at 6.05.10 PM.png…]()
 
 ------------------------------------------------------------------------
 
