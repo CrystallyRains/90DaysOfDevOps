@@ -1,13 +1,15 @@
-# Day 19 - Shell Scripting Projects
+# Day 19 - Shell Scripting Projects, Cron Jobs & Scheduled Maintenance
 
 ## Objective
 
-Today was about putting the Bash concepts from the previous days together into practical scripts.
+Today was about putting the Bash concepts from the previous days together into practical scripts and learning how to automate those scripts using `cron`.
 
 ### Projects
 
-- **Backup Script** → creates a compressed backup and removes old backups.
-- **Log Rotation Script** → compresses old logs and deletes older compressed logs.
+* **Backup Script** → creates a compressed backup and removes old backups.
+* **Log Rotation Script** → compresses old logs and deletes older compressed logs.
+* **Scheduled Maintenance Script** → combines log rotation and backup into one automated workflow.
+* **Cron Jobs** → schedules scripts to run automatically at specific times.
 
 The goal is not to memorize the scripts. The important part is understanding the **flow** and the Bash concepts being used.
 
@@ -43,7 +45,7 @@ Delete backups older than 14 days
 
 The script expects two positional arguments:
 
-```bash
+```text
 $1 → source directory
 $2 → backup destination
 ```
@@ -409,34 +411,286 @@ Backup process complete.
 
 ---
 
+# Task 3 — Crontab
+
+## Checking Existing Cron Jobs
+
+Checked the current cron jobs using:
+
+```bash
+crontab -l
+```
+
+Output:
+
+```text
+crontab: no crontab for snigdha
+```
+
+This means there were no cron jobs currently scheduled for my user.
+
+---
+
+## Cron Syntax
+
+```text
+* * * * * command
+│ │ │ │ │
+│ │ │ │ └── Day of week (0-7)
+│ │ │ └──── Month (1-12)
+│ │ └────── Day of month (1-31)
+│ └──────── Hour (0-23)
+└────────── Minute (0-59)
+```
+
+The five fields are:
+
+**minute → hour → day of month → month → day of week**
+
+---
+
+## Required Cron Entries
+
+### Run `log_rotate.sh` every day at 2 AM
+
+```cron
+0 2 * * * /Users/user1/script_for_day_16/day_3/project-1/log_rotate.sh
+```
+
+### Run `backup.sh` every Sunday at 3 AM
+
+```cron
+0 3 * * 0 /Users/user1/script_for_day_16/day_3/project-1/backup.sh
+```
+
+### Run a health check every 5 minutes
+
+```cron
+*/5 * * * * /path/to/health_check.sh
+```
+
+---
+
+## Hands-on Cron Test
+
+Instead of only writing the cron syntax in the Markdown, I also tested a simple cron job.
+
+The following job writes the current date to a file every minute:
+
+```cron
+* * * * * date >> /tmp/cron_test.txt
+```
+
+After waiting, the file contained:
+
+```text
+Sat Aug 15 23:02:00 IST 2026
+Sat Aug 15 23:03:00 IST 2026
+Sat Aug 15 23:04:00 IST 2026
+```
+
+This confirmed that the cron job was running every minute.
+
+The test cron job was then removed.
+
+---
+
+# Task 4 — Scheduled Maintenance Script
+
+The next step was to combine the existing scripts into one maintenance workflow.
+
+The maintenance script:
+
+1. Calls the log rotation script.
+2. Calls the backup script.
+3. Adds timestamps.
+4. Saves all output to a maintenance log.
+
+---
+
+## Test Setup
+
+Created directories for testing:
+
+```bash
+mkdir -p test_logs backups
+```
+
+Created a sample log file:
+
+```bash
+echo "Test log entry" > test_logs/app.log
+```
+
+The directory contained:
+
+```text
+backup.sh
+log_rotate.sh
+backups/
+test_logs/
+```
+
+Both existing scripts were tested successfully:
+
+```bash
+./log_rotate.sh test_logs
+```
+
+Output:
+
+```text
+Total files compressed: 0
+Total files deleted: 0
+```
+
+Then:
+
+```bash
+./backup.sh test_logs backups
+```
+
+Output:
+
+```text
+Archive created successfully!
+Archive Name: backup-2026-08-15.tar.gz
+Archive Size: 4.0K
+Cleaning up backups older than 14 days in backups...
+Backup process complete.
+```
+
+---
+
+## `maintenance.sh`
+
+```bash
+#!/bin/bash
+
+LOG_FILE="./maintenance.log"
+
+{
+    echo "===== Maintenance started: $(date) ====="
+
+    echo "--- Log Rotation ---"
+    ./log_rotate.sh test_logs
+
+    echo "--- Backup ---"
+    ./backup.sh test_logs backups
+
+    echo "===== Maintenance completed: $(date) ====="
+    echo
+} >> "$LOG_FILE" 2>&1
+
+echo "Maintenance completed. Output logged to $LOG_FILE"
+```
+
+Made the script executable:
+
+```bash
+chmod +x maintenance.sh
+```
+
+---
+
+## Testing the Maintenance Script
+
+Ran:
+
+```bash
+./maintenance.sh
+```
+
+Output:
+
+```text
+Maintenance completed. Output logged to ./maintenance.log
+```
+
+The generated `maintenance.log` contained:
+
+```text
+===== Maintenance started: Sat Aug 15 23:11:25 IST 2026 =====
+--- Log Rotation ---
+Total files compressed: 0
+Total files deleted: 0
+--- Backup ---
+Archive created successfully!
+Archive Name: backup-2026-08-15.tar.gz
+Archive Size: 4.0K
+Cleaning up backups older than 14 days in backups...
+Backup process complete.
+===== Maintenance completed: Sat Aug 15 23:11:25 IST 2026 =====
+```
+
+The output from both scripts was successfully captured in a single log file.
+
+---
+
+## Scheduling the Maintenance Script
+
+The maintenance script can be scheduled to run every day at 1 AM with:
+
+```cron
+0 1 * * * /Users/user1/script_for_day_16/day_3/project-1/maintenance.sh
+```
+
+`0 1 * * *` means:
+
+**Every day at 1:00 AM.**
+
+This cron entry was documented but not left scheduled.
+
+---
+
 # Commands & Concepts to Remember
 
-| Command / Concept | What it does |
-|---|---|
-| `chmod +x` | Makes a script executable |
-| `$1`, `$2` | Positional arguments |
-| `$?` | Previous command's exit status |
-| `-d` | Checks for a directory |
-| `-f` | Checks for a regular file |
-| `-z` | Checks whether a string is empty |
-| `mkdir -p` | Creates a directory if needed |
-| `tar -czf` | Creates a gzip-compressed archive |
-| `gzip` | Compresses a file |
-| `find` | Searches for files/directories |
-| `-mtime` | Filters by modification age |
-| `rm` | Deletes files |
-| `du -sh` | Shows human-readable disk usage |
-| `date` | Gets the date/time |
-| `$()` | Command substitution |
-| `\|` | Pipes output to another command |
-| `((var++))` | Increments a variable |
-| `touch -t` | Sets a specific file timestamp |
+| Command / Concept | What it does                                      |
+| ----------------- | ------------------------------------------------- |
+| `chmod +x`        | Makes a script executable                         |
+| `$1`, `$2`        | Positional arguments                              |
+| `$?`              | Previous command's exit status                    |
+| `-d`              | Checks for a directory                            |
+| `-f`              | Checks for a regular file                         |
+| `-z`              | Checks whether a string is empty                  |
+| `mkdir -p`        | Creates a directory if needed                     |
+| `tar -czf`        | Creates a gzip-compressed archive                 |
+| `gzip`            | Compresses a file                                 |
+| `find`            | Searches for files/directories                    |
+| `-mtime`          | Filters by modification age                       |
+| `rm`              | Deletes files                                     |
+| `du -sh`          | Shows human-readable disk usage                   |
+| `date`            | Gets the date/time                                |
+| `$()`             | Command substitution                              |
+| `\|`              | Pipes output to another command                   |
+| `((var++))`       | Increments a variable                             |
+| `touch -t`        | Sets a specific file timestamp                    |
+| `crontab -l`      | Lists scheduled cron jobs                         |
+| `cron`            | Runs commands automatically on a schedule         |
+| `>>`              | Appends output to a file                          |
+| `2>&1`            | Sends errors to the same place as standard output |
+
+---
+
+# What I Learned
+
+### 1. Cron can automate repetitive tasks
+
+Instead of manually running scripts, cron can execute them at specific times.
+
+### 2. Bash scripts can be combined into larger workflows
+
+`maintenance.sh` showed how existing scripts can be called from another script to create a complete maintenance process.
+
+### 3. Logging makes automation easier to monitor
+
+Saving the output of scheduled tasks to a log file makes it possible to check what happened after an automated job runs.
 
 ---
 
 # Day 19 Takeaway
 
-The bigger lesson today was **combining simple commands into automation**.
+The bigger lesson today was **combining simple commands and scripts into automation**.
 
 Instead of running:
 
@@ -448,14 +702,18 @@ tar
 du
 ```
 
-manually every time, Bash lets us turn the whole workflow into a reusable script.
+manually every time, Bash lets us turn the workflow into reusable scripts.
 
-These two projects are small, but the same ideas are useful in real DevOps tasks such as:
+Then, with cron, those scripts can run automatically on a schedule.
 
-- backups
-- log management
-- cleanup jobs
-- scheduled maintenance
-- disk-space management
+These projects are small, but the same ideas are useful in real DevOps tasks such as:
+
+* backups
+* log management
+* cleanup jobs
+* scheduled maintenance
+* disk-space management
 
 The scripts are the practice. The **patterns behind them** are what are worth remembering.
+
+**Day 19 completed. 🚀**
