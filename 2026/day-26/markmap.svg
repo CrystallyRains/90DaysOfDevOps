@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="markmap mm-tdzjjl-2" style="width: 100%; height: 100%;"><style>.markmap{--markmap-max-width: 9999px;--markmap-a-color: #0097e6;--markmap-a-hover-color: #00a8ff;--markmap-code-bg: #f0f0f0;--markmap-code-color: #555;--markmap-highlight-bg: #ffeaa7;--markmap-table-border: 1px solid currentColor;--markmap-font: 300 16px/20px sans-serif;--markmap-circle-open-bg: #fff;--markmap-text-color: #333;--markmap-highlight-node-bg: #ff02;font:var(--markmap-font);color:var(--markmap-text-color)}.markmap-link{fill:none}.markmap-node&gt;circle{cursor:pointer}.markmap-foreign{display:inline-block}.markmap-foreign p{margin:0}.markmap-foreign a{color:var(--markmap-a-color)}.markmap-foreign a:hover{color:var(--markmap-a-hover-color)}.markmap-foreign code{padding:.25em;font-size:calc(1em - 2px);color:var(--markmap-code-color);background-color:var(--markmap-code-bg);border-radius:2px}.markmap-foreign pre{margin:0}.markmap-foreign pre&gt;code{display:block}.markmap-foreign del{text-decoration:line-through}.markmap-foreign em{font-style:italic}.markmap-foreign strong{font-weight:700}.markmap-foreign mark{background:var(--markmap-highlight-bg)}.markmap-foreign table,.markmap-foreign th,.markmap-foreign td{border-collapse:collapse;border:var(--markmap-table-border)}.markmap-foreign img{display:inline-block}.markmap-foreign svg{fill:currentColor}.markmap-foreign&gt;div{width:var(--markmap-max-width);text-align:left}.markmap-foreign&gt;div&gt;div{display:inline-block}.markmap-highlight rect{fill:var(--markmap-highlight-node-bg)}.markmap-dark .markmap{--markmap-code-bg: #1a1b26;--markmap-code-color: #ddd;--markmap-circle-open-bg: #444;--markmap-text-color: #eee}</style><g transform="translate(20,311.55181437543615) scale(0.5303558967201675)"><path class="markmap-link" data-depth="3" data-path="1.2.3" d="M724,-349.031C764,-349.031,764,-390.781,804,-390.781" stroke-width="1.375" stroke="rgb(44, 160, 44)"/><path class="markmap-link" data-depth="3" data-path="1.2.4" d="M724,-349.031C764,-349.031,764,-362.406,804,-362.406" stroke-width="1.375" stroke="rgb(214, 39, 40)"/><path class="markmap-link" data-depth="3" data-path="1.2.5" d="M724,-349.031C764,-349.031,764,-334.031,804,-334.031" stroke-width="1.375" stroke="rgb(148, 103, 189)"/><path class="markmap-link" data-depth="3" data-path="1.2.6" d="M724,-349.031C764,-349.031,764,-305.656,804,-305.656" stroke-width="1.375" stroke="rgb(140, 86, 75)"/><path class="markmap-link" data-depth="3" data-path="1.7.8" d="M757,-208.094C797,-208.094,797,-142.281,837,-142.281" stroke-width="1.375" stroke="rgb(127, 127, 127)"/><path class="markmap-link" data-depth="3" data-path="1.9.10" d="M620,-66.219C660,-66.219,660,-21.906,700,-21.906" stroke-width="1.375" stroke="rgb(23, 190, 207)"/><path class="markmap-link" data-depth="3" data-path="1.11.12" d="M671,75.656C711,75.656,711,141.469,751,141.469" stroke-width="1.375" stroke="rgb(255, 127, 14)"/><path class="markmap-link" data-depth="3" data-path="1.13.14" d="M741,196.031C781,196.031,781,218.844,821,218.844" stroke-width="1.375" stroke="rgb(214, 39, 40)"/><path class="markmap-link" data-depth="3" data-path="1.15.16" d="M664,294.906C704,294.906,704,339.219,744,339.219" stroke-width="1.375" stroke="rgb(140, 86, 75)"/><path class="markmap-link" data-depth="2" data-path="1.2" d="M423,11.25C463,11.25,463,-349.031,503,-349.031" stroke-width="1.75" stroke="rgb(255, 127, 14)"/><path class="markmap-link" data-depth="2" data-path="1.7" d="M423,11.25C463,11.25,463,-208.094,503,-208.094" stroke-width="1.75" stroke="rgb(227, 119, 194)"/><path class="markmap-link" data-depth="2" data-path="1.9" d="M423,11.25C463,11.25,463,-66.219,503,-66.219" stroke-width="1.75" stroke="rgb(188, 189, 34)"/><path class="markmap-link" data-depth="2" data-path="1.11" d="M423,11.25C463,11.25,463,75.656,503,75.656" stroke-width="1.75" stroke="rgb(31, 119, 180)"/><path class="markmap-link" data-depth="2" data-path="1.13" d="M423,11.25C463,11.25,463,196.031,503,196.031" stroke-width="1.75" stroke="rgb(44, 160, 44)"/><path class="markmap-link" data-depth="2" data-path="1.15" d="M423,11.25C463,11.25,463,294.906,503,294.906" stroke-width="1.75" stroke="rgb(148, 103, 189)"/><path class="markmap-link" data-depth="2" data-path="1.17" d="M423,11.25C463,11.25,463,370.781,503,370.781" stroke-width="1.75" stroke="rgb(227, 119, 194)"/><g class="markmap-highlight"/><g data-depth="3" data-path="1.2.3" class="markmap-node" transform="translate(804, -413.46875)"><line stroke="#2ca02c" stroke-width="1.375" x1="-1" x2="445" y1="22.6875" y2="22.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="427" height="22"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Installed <code>gh</code> via Homebrew: <code>brew install gh</code> → version 2.98.0</div></div></foreignObject></g><g data-depth="3" data-path="1.2.4" class="markmap-node" transform="translate(804, -385.09375)"><line stroke="#d62728" stroke-width="1.375" x1="-1" x2="386" y1="22.6875" y2="22.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="368" height="22"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Authenticated via browser device flow: <code>gh auth login</code></div></div></foreignObject></g><g data-depth="3" data-path="1.2.5" class="markmap-node" transform="translate(804, -356.71875)"><line stroke="#9467bd" stroke-width="1.375" x1="-1" x2="423" y1="22.6875" y2="22.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="405" height="22"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Verified with <code>gh auth status</code> — logged in as CrystallyRains</div></div></foreignObject></g><g data-depth="3" data-path="1.2.6" class="markmap-node" transform="translate(804, -328.34375)"><line stroke="#8c564b" stroke-width="1.375" x1="-1" x2="339" y1="22.6875" y2="22.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="321" height="22"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Token scopes: <code>gist</code>, <code>read:org</code>, <code>repo</code>, <code>workflow</code></div></div></foreignObject></g><g data-depth="2" data-path="1.2" class="markmap-node" transform="translate(503, -369.90625)"><line stroke="#ff7f0e" stroke-width="1.75" x1="-1" x2="223" y1="20.875" y2="20.875"/><circle stroke-width="1.5" r="6" stroke="#ff7f0e" fill="var(--markmap-circle-open-bg)" cx="221" cy="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="205" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Task 1: Install &amp; Authenticate</div></div></foreignObject></g><g data-depth="3" data-path="1.7.8" class="markmap-node" transform="translate(837, -294.96875)"><line stroke="#7f7f7f" stroke-width="1.375" x1="-1" x2="598" y1="152.6875" y2="152.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="580" height="152"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><table data-lines="14,22">
+<thead data-lines="14,15">
+<tr data-lines="14,15">
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody data-lines="16,22">
+<tr data-lines="16,17">
+<td>Create repo</td>
+<td><code>gh repo create test-gh-cli --public --add-readme</code></td>
+</tr>
+<tr data-lines="17,18">
+<td>Clone repo</td>
+<td><code>gh repo clone CrystallyRains/90DaysOfDevOps</code></td>
+</tr>
+<tr data-lines="18,19">
+<td>View details</td>
+<td><code>gh repo view CrystallyRains/90DaysOfDevOps</code></td>
+</tr>
+<tr data-lines="19,20">
+<td>List repos</td>
+<td><code>gh repo list CrystallyRains --limit 30</code></td>
+</tr>
+<tr data-lines="20,21">
+<td>Open in browser</td>
+<td><code>gh repo view --web</code></td>
+</tr>
+<tr data-lines="21,22">
+<td>Delete repo</td>
+<td><code>gh repo delete test-gh-cli --yes</code> (needed <code>delete_repo</code> scope refresh)</td>
+</tr>
+</tbody>
+</table></div></div></foreignObject></g><g data-depth="2" data-path="1.7" class="markmap-node" transform="translate(503, -228.96875)"><line stroke="#e377c2" stroke-width="1.75" x1="-1" x2="256" y1="20.875" y2="20.875"/><circle stroke-width="1.5" r="6" stroke="#e377c2" fill="var(--markmap-circle-open-bg)" cx="254" cy="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="238" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Task 2: Working with Repositories</div></div></foreignObject></g><g data-depth="3" data-path="1.9.10" class="markmap-node" transform="translate(700, -131.59375)"><line stroke="#17becf" stroke-width="1.375" x1="-1" x2="488" y1="109.6875" y2="109.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="470" height="109"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><table data-lines="26,32">
+<thead data-lines="26,27">
+<tr data-lines="26,27">
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody data-lines="28,32">
+<tr data-lines="28,29">
+<td>Create issue</td>
+<td><code>gh issue create --title "..." --body "..." --label "documentation"</code></td>
+</tr>
+<tr data-lines="29,30">
+<td>List issues</td>
+<td><code>gh issue list</code></td>
+</tr>
+<tr data-lines="30,31">
+<td>View issue</td>
+<td><code>gh issue view 1</code></td>
+</tr>
+<tr data-lines="31,32">
+<td>Close issue</td>
+<td><code>gh issue close 1</code></td>
+</tr>
+</tbody>
+</table></div></div></foreignObject></g><g data-depth="2" data-path="1.9" class="markmap-node" transform="translate(503, -87.09375)"><line stroke="#bcbd22" stroke-width="1.75" x1="-1" x2="119" y1="20.875" y2="20.875"/><circle stroke-width="1.5" r="6" stroke="#bcbd22" fill="var(--markmap-circle-open-bg)" cx="117" cy="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="101" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Task 3: Issues</div></div></foreignObject></g><g data-depth="3" data-path="1.11.12" class="markmap-node" transform="translate(751, -11.21875)"><line stroke="#ff7f0e" stroke-width="1.375" x1="-1" x2="381" y1="152.6875" y2="152.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="363" height="152"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><table data-lines="41,49">
+<thead data-lines="41,42">
+<tr data-lines="41,42">
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody data-lines="43,49">
+<tr data-lines="43,44">
+<td>Create branch</td>
+<td><code>git checkout -b day26-gh-cli-notes</code></td>
+</tr>
+<tr data-lines="44,45">
+<td>Push branch</td>
+<td><code>git push -u origin day26-gh-cli-notes</code></td>
+</tr>
+<tr data-lines="45,46">
+<td>Create PR</td>
+<td><code>gh pr create --fill</code></td>
+</tr>
+<tr data-lines="46,47">
+<td>List PRs</td>
+<td><code>gh pr list</code></td>
+</tr>
+<tr data-lines="47,48">
+<td>View PR</td>
+<td><code>gh pr view 2</code></td>
+</tr>
+<tr data-lines="48,49">
+<td>Merge PR</td>
+<td><code>gh pr merge 2 --squash --delete-branch</code></td>
+</tr>
+</tbody>
+</table></div></div></foreignObject></g><g data-depth="2" data-path="1.11" class="markmap-node" transform="translate(503, 54.78125)"><line stroke="#1f77b4" stroke-width="1.75" x1="-1" x2="170" y1="20.875" y2="20.875"/><circle stroke-width="1.5" r="6" stroke="#1f77b4" fill="var(--markmap-circle-open-bg)" cx="168" cy="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="152" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Task 4: Pull Requests</div></div></foreignObject></g><g data-depth="3" data-path="1.13.14" class="markmap-node" transform="translate(821, 152.15625)"><line stroke="#d62728" stroke-width="1.375" x1="-1" x2="402" y1="66.6875" y2="66.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="384" height="66"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><table data-lines="61,65">
+<thead data-lines="61,62">
+<tr data-lines="61,62">
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody data-lines="63,65">
+<tr data-lines="63,64">
+<td>List runs</td>
+<td><code>gh run list --repo actions/checkout</code></td>
+</tr>
+<tr data-lines="64,65">
+<td>View run</td>
+<td><code>gh run view 32631582718 --repo actions/checkout</code></td>
+</tr>
+</tbody>
+</table></div></div></foreignObject></g><g data-depth="2" data-path="1.13" class="markmap-node" transform="translate(503, 175.15625)"><line stroke="#2ca02c" stroke-width="1.75" x1="-1" x2="240" y1="20.875" y2="20.875"/><circle stroke-width="1.5" r="6" stroke="#2ca02c" fill="var(--markmap-circle-open-bg)" cx="238" cy="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="222" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Task 5: GitHub Actions Preview</div></div></foreignObject></g><g data-depth="3" data-path="1.15.16" class="markmap-node" transform="translate(744, 229.53125)"><line stroke="#8c564b" stroke-width="1.375" x1="-1" x2="685" y1="109.6875" y2="109.6875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="667" height="109"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><table data-lines="72,78">
+<thead data-lines="72,73">
+<tr data-lines="72,73">
+<th>Command</th>
+<th>What I Did</th>
+</tr>
+</thead>
+<tbody data-lines="74,78">
+<tr data-lines="74,75">
+<td><code>gh api</code></td>
+<td><code>gh api repos/CrystallyRains/90DaysOfDevOps --jq '.stargazers_count'</code> → returned <code>0</code></td>
+</tr>
+<tr data-lines="75,76">
+<td><code>gh release create</code></td>
+<td><code>gh release create v1.0.0 --notes "First stable release"</code></td>
+</tr>
+<tr data-lines="76,77">
+<td><code>gh alias set</code></td>
+<td><code>co</code> → <code>pr checkout</code>, <code>pv</code> → <code>pr view</code></td>
+</tr>
+<tr data-lines="77,78">
+<td><code>gh search repos</code></td>
+<td><code>gh search repos "kubernetes terraform" --stars="&gt;100" --language=HCL</code></td>
+</tr>
+</tbody>
+</table></div></div></foreignObject></g><g data-depth="2" data-path="1.15" class="markmap-node" transform="translate(503, 274.03125)"><line stroke="#9467bd" stroke-width="1.75" x1="-1" x2="163" y1="20.875" y2="20.875"/><circle stroke-width="1.5" r="6" stroke="#9467bd" fill="var(--markmap-circle-open-bg)" cx="161" cy="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="145" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Task 6: Useful Tricks</div></div></foreignObject></g><g data-depth="2" data-path="1.17" class="markmap-node" transform="translate(503, 349.90625)"><line stroke="#e377c2" stroke-width="1.75" x1="-1" x2="231" y1="20.875" y2="20.875"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="213" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Favorite Command of the Day</div></div></foreignObject></g><g data-depth="1" data-path="1" class="markmap-node" transform="translate(0, -10)"><line stroke="#1f77b4" stroke-width="2.5" x1="-1" x2="425" y1="21.25" y2="21.25"/><circle stroke-width="1.5" r="6" stroke="#1f77b4" fill="var(--markmap-circle-open-bg)" cx="423" cy="21.25"/><foreignObject class="markmap-foreign" x="8" y="0" style="opacity: 1;" width="407" height="20"><div xmlns="http://www.w3.org/1999/xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Day 26 – GitHub CLI: Manage GitHub from Your Terminal</div></div></foreignObject></g></g></svg>
