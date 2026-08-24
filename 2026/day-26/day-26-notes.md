@@ -1,6 +1,4 @@
-# Day 26 Notes
-
-# Day 26 – GitHub CLI: Manage GitHub from Your Terminal
+# Day 26 - GitHub CLI: Manage GitHub from Your Terminal
 
 ## Task 1: Install & Authenticate
 - Installed `gh` via Homebrew: `brew install gh` → version 2.98.0
