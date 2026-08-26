@@ -37,7 +37,7 @@ Go through the checklist below. For each item, mark yourself honestly:
 - **Haven't done yet**
 
 #### Linux
-- [ ] Navigate the file system, create/move/delete files and directories
+- [- ] Navigate the file system, create/move/delete files and directories
 - [ ] Manage processes — list, kill, background/foreground
 - [ ] Work with systemd — start, stop, enable, check status of services
 - [ ] Read and edit text files using vi/vim or nano
