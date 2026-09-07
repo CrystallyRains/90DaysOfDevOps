@@ -1,0 +1,26 @@
+services:
+  web:
+    image: wordpress:latest
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: "${WORDPRESS_DB_USER}"
+      WORDPRESS_DB_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      WORDPRESS_DB_NAME: "${WORDPRESS_DB_NAME}"
+    networks:
+      - webnet
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - webnet
+      
+volumes:
+  db_data:
+networks:
+  webnet:
