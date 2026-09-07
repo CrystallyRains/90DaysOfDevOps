@@ -1,0 +1,14 @@
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    networks:
+      - webnet
+
+volumes:
+  db_data:
+networks:
+  webnet:
