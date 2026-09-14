@@ -1,0 +1,19 @@
+server:
+  name: mac
+  ip: 10.0.0.1
+  port: 80
+
+database:
+  host: 10.0.0.2
+  name: mydb
+  credentials:
+    user: "${username}"
+    password: "${password}"
+
+startup_script: |
+  npm install
+  npm run dev
+
+another: >
+  Select *
+  FROM students
