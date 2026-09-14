@@ -1,0 +1,13 @@
+name: Snigdha
+role: DevOps Engineer
+experience_years: 4
+learning: true
+
+tools:
+  - GitHub
+  - Shell Scripting
+  - Docker
+  - GitHub Actions
+  - Linux
+
+hobbies: ["reading", "writing", "roaming"]
